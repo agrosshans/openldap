@@ -10,6 +10,7 @@
 
 [OpenLDAP](https://www.openldap.org/) container image with built-in bootstrap, backup helpers, TLS, replication and upgrade support.
 
+
 > ⚠️ WARNING
 > **v2 is a breaking release.** Existing v1 deployments are **not** migrated automatically and require a **manual migration** to move to v2.
 > Automatic upgrade paths are intended only between future v2 versions (for example, v2.x to v2.y).
