@@ -28,7 +28,8 @@ RUN container packages install --update --clean \
 # Install some of my troubleshooting tools
 RUN container packages install --update --clean \
     openssl \
-    curl
+    curl \
+    ca-certificates
 
 COPY ldap.conf /etc/openldap/ldap.conf
 
@@ -38,8 +39,10 @@ COPY --chown=911:911 ldap.lanathome.org.key /container/services/openldap/assets/
 
 
 COPY lanathome.org-root.crt /usr/local/share/ca-certificates/lanathome.org-root.crt
+COPY ldap.lanathome.org.key /usr/local/share/ca-certificates/ldap.lanathome.org.key
+COPY ldap.lanathome.org.crt /usr/local/share/ca-certificates/ldap.lanathome.org.crt
 
-RUN update-ca-certificates
+RUN /bin/sh -c update-ca-certificates
 
 COPY services /container/services
 
