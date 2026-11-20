@@ -8,6 +8,31 @@ ENV CONTAINER_IMAGE=${IMAGE}
 ARG OPENLDAP_GROUP_GID=911
 ARG OPENLDAP_USER_UID=911
 
+# Install ca-certificates
+RUN apk add --no-cache ca-certificates
+
+
+# Install curl
+RUN apk add --no-cache curl
+
+# Install openssl
+RUN apk add --no-cache openssl
+
+# Copy my root CA certificate into the system directory
+COPY ./lanathome.org-root.crt \
+      /usr/local/share/ca-certificates/lanathome.org-root.crt
+
+# Copy the ldap.lanathome.org CA certificate
+COPY ./ldap.lanathome.org.crt \
+      /usr/local/share/ca-certificates/ldap.lanathome.org.crt
+
+# Copy the ldap.lanathome.org KEY certificate
+COPY ./ldap.lanathome.org.key \
+      /usr/local/share/ca-certificates/ldap.lanathome.org.key
+
+# Update the trust store
+RUN update-ca-certificates
+
 RUN container groups add "${OPENLDAP_GROUP_GID}" ldap \
     && container users add "${OPENLDAP_USER_UID}" ldap --group-id "${OPENLDAP_GROUP_GID}" --group-name ldap
 
@@ -31,6 +56,8 @@ RUN container services install \
     && container services link
 
 COPY environment /container/environment
+
+COPY ./ldap.conf /etc/openldap/ldap.conf
 
 USER ldap
 
