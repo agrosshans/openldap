@@ -1,1 +1,8 @@
+<<<<<<< HEAD
 vendor
+=======
+lanathome.org-root.crt
+ldap.lanathome.org.key
+ldap.lanathome.org.crt
+lanathome.org.rootCA.crt
+>>>>>>> 3dd83dbf73214dfb6124aba96301ac2ddc019d36
