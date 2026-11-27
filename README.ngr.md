@@ -100,6 +100,32 @@ sudo podman network create --driver bridge \
   phpldapadmin-bridge
 ```
 
+**run openldap container with the following command**
+
+``` bash
+sudo podman run --name openldap --hostname ldap.lanathome.org \
+  --ip 10.89.12.10 \
+  --publish 3890:3890 \
+  --publish 6360:6360 \
+  --network phpldapadmin-bridge \
+  --volume /home/ngr/Containers/ngr-compose/ldap-phpldapadmin/openldap/certs:/container/services/openldap/assets/certs:Z \
+  --env-file /home/ngr/Containers/ngr-compose/ldap-phpldapadmin/openldap/.env \
+  quay.io/agrosshans/ngr-container-openldap
+```
+
+**run phpldapadmin container with the following command**
+
+``` bash
+sudo podman run --name phpldapadmin --hostname phpldapadmin.lanathome.org \
+  --network phpldapadmin-bridge \
+  --ip 10.89.12.20 \
+  --publish 9080:80/tcp \
+  --publish 9443:443/tcp \
+  --volume /home/ngr/Containers/ngr-compose/ldap-phpldapadmin/phpldapadmin/certs:/container/service/phpldapadmin/assets/apache2/certs:Z \
+  --env-file /home/ngr/Containers/ngr-compose/ldap-phpldapadmin/phpldapadmin/.env \
+docker.io/phpldapadmin/phpldapadmin:latest
+```
+
 **check the network interface and ip address of the rootfull network created for openldap and phpldapadmin containers**
 
 ``` bash
