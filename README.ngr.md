@@ -100,9 +100,35 @@ sudo podman run --name openldap --hostname ldap.lanathome.org \
   quay.io/agrosshans/ngr-container-openldap
 ```
 
+**change ownership of the certs directory to the user and group id used by the openldap container**
 
+[Rootless Podman makes sense](https://www.redhat.com/it/blog/rootless-podman-makes-sense)
+
+[Advanced containers with Podman](https://medium.com/@maros.kukan/advanced-containers-with-podman-f79302de85b0)
+
+
+``` bash
 -rw-r--r--. 1 911 911 41 Nov 23 11:52 ./openldap/certs/lanathome.org-root.srl
 -rw-r--r--. 1 524288 524288 1769 Nov 23 11:52 ./phpldapadmin/certs/phpldapadmin.lanathome.org.crt
+```
+
+``` bash
+$ podman unshare cat /proc/self/uid_map
+         0       1000          1
+         1     524288      65536
+```
+
+``` bash
+$ podman unshare chown -R 911:911 ./openldap/certs/
+```
+
+
+
+
+``` bash
+$ podman unshare chown -R 911:911 ./phpldapadmin/certs/
+```
+
 
 
 **run phpldapadmin container with the following command**
