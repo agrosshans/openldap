@@ -107,9 +107,31 @@ sudo podman run --name openldap --hostname ldap.lanathome.org \
 [Advanced containers with Podman](https://medium.com/@maros.kukan/advanced-containers-with-podman-f79302de85b0)
 
 
+then it looks like this:
+
+
 ``` bash
--rw-r--r--. 1 911 911 41 Nov 23 11:52 ./openldap/certs/lanathome.org-root.srl
--rw-r--r--. 1 524288 524288 1769 Nov 23 11:52 ./phpldapadmin/certs/phpldapadmin.lanathome.org.crt
+-rw-r--r--. 1 911 911       ./openldap/certs/lanathome.org-root.srl
+-rw-r--r--. 1 524288 524288 ./phpldapadmin/certs/phpldapadmin.lanathome.org.crt
+```
+
+
+
+
+
+**Display the UID and GID for current user within the container**
+``` bash
+ sudo podman exec openldap /usr/bin/id
+uid=911(ldap) gid=911(ldap) groups=911(ldap)
+```
+
+
+**Confirm the host user that runs the process**
+
+``` bash
+$ ps -o pid,user,cmd -p $(sudo podman inspect openldap -f {{.State.Pid}})
+    PID USER     CMD
+ 169582 911      /usr/sbin/container
 ```
 
 ``` bash
