@@ -182,8 +182,8 @@ veth0@if2        UP             fe80::602d:b3ff:fe7b:6768/64
 **add the rootfull network interface and ip address to the systemd-resolved configuration**
 
 ``` bash
-sudo resolvectl dns podman6 10.89.12.1
-sudo resolvectl domain podman6 "~podman"
+$ sudo resolvectl dns podman6 10.89.12.1
+$ sudo resolvectl domain podman6 "~podman" "~lanathome.org"
 ```
 
 **change the admin password**
