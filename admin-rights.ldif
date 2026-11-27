@@ -1,0 +1,8 @@
+dn: olcDatabase={0}config,cn=config
+changetype: modify
+replace: olcAccess
+olcAccess: {0}to * 
+  by dn.exact="gidNumber=911+uidNumber=911,cn=peercred,cn=external,cn=auth" manage 
+  by dn.base="cn=admin,ou=services,dc=lanathome,dc=org" write 
+  by dn.base="uid=agrosshans,ou=users,dc=lanathome,dc=org" write 
+  by * none

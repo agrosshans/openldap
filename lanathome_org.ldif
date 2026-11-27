@@ -1,0 +1,100 @@
+# extended LDIF
+#
+# LDAPv3
+# base <dc=lanathome,dc=org> with scope subtree
+# filter: (objectClass=*)
+# requesting: * + 
+#
+
+# lanathome.org
+dn: dc=lanathome,dc=org
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: lanathome Inc.
+dc: lanathome
+
+# 2. Branche pour organiser les utilisateurs (OU)
+dn: ou=users,dc=lanathome,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+# 3. Branche pour organiser les groupes (OU)
+dn: ou=groups,dc=lanathome,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+# 4. Premier utilisateur (Exemple : Jean Dupont)
+dn: uid=jdupont,ou=users,dc=lanathome,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Jean Dupont
+sn: Dupont
+givenName: Jean
+uid: jdupont
+mail: jdupont@lanathome.org
+userPassword: monMotDePasseSecurise
+
+# 5. Deuxième utilisateur (Exemple : Marie Martin)
+dn: uid=mmartin,ou=users,dc=lanathome,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Marie Martin
+sn: Martin
+givenName: Marie
+uid: mmartin
+mail: mmartin@lanathome.org
+userPassword: unAutreMotDePasse
+
+
+# 6. Troisième utilisateur (Exemple : Aurélien Grosshans)
+dn: uid=agrosshans,ou=users,dc=lanathome,dc=org
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: Aurélien Grosshans
+sn: Grosshans
+givenName: Aurélien
+uidNumber: 10000
+gidNumber: 10000
+uid: agrosshans
+mail: aurelien.grosshans@lanathome.org
+homeDirectory: /home/agrosshans
+loginShell: /bin/bash
+userPassword: unAutreMotDePasse
+
+
+
+
+# 7. Un groupe contenant les deux utilisateurs (Classe standard posixGroup)
+dn: cn=developpeurs,ou=groups,dc=lanathome,dc=org
+objectClass: top
+objectClass: posixGroup
+cn: developpeurs
+gidNumber: 5001
+memberUid: jdupont
+memberUid: mmartin
+
+# 8. Un groupe alternatif (Classe standard groupOfNames)
+dn: cn=utilisateurs_web,ou=groups,dc=lanathome,dc=org
+objectClass: top
+objectClass: groupOfNames
+cn: utilisateurs_web
+member: uid=jdupont,ou=users,dc=lanathome,dc=org
+member: uid=mmartin,ou=users,dc=lanathome,dc=org
+
+
+# 9. Un groupe admin (Classe standard posixGroup)
+dn: cn=admin,ou=groups,dc=lanathome,dc=org
+objectClass: groupOfNames
+objectClass: posixGroup
+gidNumber: 10000
+cn: admin
+member: uid=agrosshans,ou=users,dc=lanathome,dc=org
