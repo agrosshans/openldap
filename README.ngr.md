@@ -186,6 +186,19 @@ $ sudo resolvectl dns podman6 10.89.12.1
 $ sudo resolvectl domain podman6 "~podman" "~lanathome.org"
 ```
 
+**Verify Resolution**
+
+Test that the host resolves the domain using resolvectl (avoid nslookup or dig, as they often bypass systemd-resolved unless pointed directly at 127.0.0.53):
+
+``` bash
+$ resolvectl query ldap.lanathome.org
+ldap.lanathome.org: 10.89.12.10                -- link: podman6
+
+-- Information acquired via protocol DNS in 1.1ms.
+-- Data is authenticated: no; Data was acquired via local or encrypted transport: no
+-- Data from: network
+``` 
+
 **change the admin password**
 
 ``` bash
