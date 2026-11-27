@@ -1,0 +1,76 @@
+# extended LDIF
+#
+# LDAPv3
+# base <dc=lanathome,dc=org> with scope subtree
+# filter: (objectClass=*)
+# requesting: * + 
+#
+
+# 2. Branche pour organiser les utilisateurs (OU)
+dn: ou=users,dc=lanathome,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+# 3. Branche pour organiser les groupes (OU)
+dn: ou=groups,dc=lanathome,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+# 4. Premier utilisateur (Exemple : Jean Dupont)
+dn: uid=ngr,ou=users,dc=lanathome,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Aurélien Grosshans
+sn: Grosshans
+givenName: Aurélien
+uid: ngr
+mail: ngr@lanathome.org
+userPassword: Ow??tALJ+'x7cy*)NY<j
+
+
+# 5. Premier utilisateur (Exemple : Jean Dupont)
+dn: uid=jdupont,ou=users,dc=lanathome,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Jean Dupont
+sn: Dupont
+givenName: Jean
+uid: jdupont
+mail: jdupont@lanathome.org
+userPassword: monMotDePasseSecurise
+
+# 6. Deuxième utilisateur (Exemple : Marie Martin)
+dn: uid=mmartin,ou=users,dc=lanathome,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Marie Martin
+sn: Martin
+givenName: Marie
+uid: mmartin
+mail: mmartin@lanathome.org
+userPassword: unAutreMotDePasse
+
+# 7. Un groupe contenant les deux utilisateurs (Classe standard posixGroup)
+dn: cn=developpeurs,ou=groups,dc=lanathome,dc=org
+objectClass: top
+objectClass: posixGroup
+cn: developpeurs
+gidNumber: 5001
+memberUid: jdupont
+memberUid: mmartin
+
+# 8. Un groupe alternatif (Classe standard groupOfNames)
+dn: cn=utilisateurs_web,ou=groups,dc=lanathome,dc=org
+objectClass: top
+objectClass: groupOfNames
+cn: utilisateurs_web
+member: uid=jdupont,ou=users,dc=lanathome,dc=org
+member: uid=mmartin,ou=users,dc=lanathome,dc=org

@@ -3,16 +3,16 @@
 **create dummy certs for openldap container**
 
 ``` bash
-mkdir -p certs
+mkdir -p openldap/certs
 ```
 
 ``` bash
-cd certs/
+cd openldap/certs
 ```
 
 **Generate a 4096-bit RSA root private key**
 ``` bash
-openssl genrsa -out lanathome.org-root.key 4096
+openssl genrsa -out openldap/certs/lanathome.org-root.key 4096
 ```
 
 
@@ -20,28 +20,29 @@ openssl genrsa -out lanathome.org-root.key 4096
 
 **Create the self-signed Root CA certificate (valid for 10 years)**
 ``` bash
-openssl req -x509 -new -nodes -key lanathome.org-root.key -sha256 -days 3650 \
+openssl req -x509 -new -nodes -key openldap/certs/lanathome.org-root.key -sha256 -days 3650 \
   -subj "/C=FR/ST=/L=SAINT-PIERRE en FAUCIGNY/O=Lanathome/OU=IT/CN=Lanathome.org Root CA" \
   -addext "basicConstraints=critical,CA:TRUE" \
   -addext "keyUsage=critical,keyCertSign,cRLSign" \
-  -out lanathome.org-root.crt
+  -out openldap/certs/lanathome.org-root.crt
 ```
 
 
 **Generate host private key**
 ``` bash
-openssl genrsa -out ldap.lanathome.org.key 2048
+openssl genrsa -out openldap/certs/ldap.lanathome.org.key 2048
 ```
 
 
 **Create a CSR for ldap.lanathome.org**
 ``` bash
-openssl req -new -key ldap.lanathome.org.key \
+openssl req -new -key openldap/certs/ldap.lanathome.org.key \
   -subj "/C=FR/ST=/L=SAINT-PIERRE en FAUCIGNY/O=Lanathome/OU=IT/CN=ldap.lanathome.org" \
-  -out ldap.lanathome.org.csr
+  -out openldap/certs/ldap.lanathome.org.csr
 ```
+
 ``` bash
-vi ldap.ext
+vi openldap/certs/ldap.ext
 
 authorityKeyIdentifier=keyid,issuer
 basicConstraints=CA:FALSE
@@ -55,9 +56,9 @@ DNS.1 = ldap.lanathome.org
 
 **Sign the CSR with your Root CA:**
 ``` bash
-openssl x509 -req -in ldap.lanathome.org.csr \
-  -CA lanathome.org-root.crt -CAkey lanathome.org-root.key -CAcreateserial \
-  -out ldap.lanathome.org.crt -days 825 -sha256 -extfile ldap.ext
+openssl x509 -req -in openldap/certs/ldap.lanathome.org.csr \
+  -CA openldap/certs/lanathome.org-root.crt -CAkey openldap/certs/lanathome.org-root.key -CAcreateserial \
+  -out openldap/certs/ldap.lanathome.org.crt -days 825 -sha256 -extfile openldap/certs/ldap.ext
 ```
 
 
@@ -66,8 +67,9 @@ openssl x509 -req -in ldap.lanathome.org.csr \
 
 **Verify the chain against your Root CA:**
 ``` bash
-openssl verify -CAfile lanathome.org-root.crt ldap.lanathome.org.crt
+openssl verify -CAfile openldap/certs/lanathome.org-root.crt openldap/certs/ldap.lanathome.org.crt
 ```
+
 
 
 **get latest openldap container image**
@@ -76,21 +78,6 @@ openssl verify -CAfile lanathome.org-root.crt ldap.lanathome.org.crt
 podman pull quay.io/agrosshans/ngr-container-openldap:latest
 ``` 
 
-**stop openldap container**
-
-``` bash
-podman stop openldap
-```
-
-**delete openldap container**
-``` bash
-podman rm openldap
-```
-
-**remove associated volume from openldap container**
-``` bash
-podman volume prune
-```
 
 **create rootfull network for openldap and phpldapadmin containers**
 ``` bash
@@ -108,10 +95,15 @@ sudo podman run --name openldap --hostname ldap.lanathome.org \
   --publish 3890:3890 \
   --publish 6360:6360 \
   --network phpldapadmin-bridge \
-  --volume /home/ngr/Containers/ngr-compose/ldap-phpldapadmin/openldap/certs:/container/services/openldap/assets/certs:Z \
-  --env-file /home/ngr/Containers/ngr-compose/ldap-phpldapadmin/openldap/.env \
+  --volume openldap/certs:/container/services/openldap/assets/certs:Z \
+  --env-file openldap/.env \
   quay.io/agrosshans/ngr-container-openldap
 ```
+
+
+-rw-r--r--. 1 911 911 41 Nov 23 11:52 ./openldap/certs/lanathome.org-root.srl
+-rw-r--r--. 1 524288 524288 1769 Nov 23 11:52 ./phpldapadmin/certs/phpldapadmin.lanathome.org.crt
+
 
 **run phpldapadmin container with the following command**
 
@@ -121,8 +113,8 @@ sudo podman run --name phpldapadmin --hostname phpldapadmin.lanathome.org \
   --ip 10.89.12.20 \
   --publish 9080:80/tcp \
   --publish 9443:443/tcp \
-  --volume /home/ngr/Containers/ngr-compose/ldap-phpldapadmin/phpldapadmin/certs:/container/service/phpldapadmin/assets/apache2/certs:Z \
-  --env-file /home/ngr/Containers/ngr-compose/ldap-phpldapadmin/phpldapadmin/.env \
+  --volume phpldapadmin/certs:/container/service/phpldapadmin/assets/apache2/certs:Z \
+  --env-file phpldapadmin/.env \
 docker.io/phpldapadmin/phpldapadmin:latest
 ```
 
@@ -149,6 +141,10 @@ sudo resolvectl domain podman6 "~podman"
 **change the admin password**
 
 ``` bash
+sudo podman exec -it openldap bash
+```
+
+``` bash
 ldap:/$ cat /etc/openldap/slapd.d/cn=config/olcDatabase={0}config.ldif
 # AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
 # CRC32 e4944e36
@@ -168,10 +164,13 @@ modifiersName: cn=config
 modifyTimestamp: 20261125101100Z
 ```
 
+**change the admin password with slappasswd command**
 ``` bash
 ldap:/$ slappasswd -s xxxxxxxxxx
 {SSHA}NAEqORXJ9uaJ4hnBSLWyW7lRyIBw3fdS
 ```
+
+**and copy the output to the olcRootPW attribute in the olcDatabase={0}config.ldif file**
 
 ``` bash
 ldap:/$ vi /etc/openldap/slapd.d/cn=config/olcDatabase={0}config.ldif
@@ -185,12 +184,12 @@ olcRootPW: {SSHA}NAEqORXJ9uaJ4hnBSLWyW7lRyIBw3fdS
 
 **copy admin-rights.ldif**
 ``` bash
-sudo podman cp admin-rights.ldif openldap:/admin-rights.ldif
+sudo podman cp openldap/admin-rights.ldif openldap:/admin-rights.ldif
 ```
 
 **copy lanathome_org.ldif**
 ``` bash
-sudo podman cp lanathome_org.ldif openldap:/lanathome_org.ldif
+sudo podman cp openldap/lanathome_org.ldif openldap:/lanathome_org.ldif
 ```
 
 
@@ -228,7 +227,21 @@ sudo podman logs --tail 50 phpldapadmin
 sudo podman logs --tail 50 openldap
 ```
 
+**stop openldap container**
 
+``` bash
+sudo podman stop openldap
+```
+
+**delete openldap container**
+``` bash
+sudo podman rm openldap
+```
+
+**remove associated volume from openldap container**
+``` bash
+sudo podman volume prune
+```
 
 **git commands to create a new branch for openldap container development**
 
@@ -251,9 +264,11 @@ git branch dev main
 
 ``` bash
 git add config.json
-``
+```
 
+``` bash
 git commit -m "xxx" ./xxxxxx
-
-
+```
+``` bash
 git push -u openldap openldap/dev-3
+```

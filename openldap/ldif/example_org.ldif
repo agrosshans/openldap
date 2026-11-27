@@ -1,0 +1,62 @@
+# extended LDIF
+#
+# LDAPv3
+# base <dc=example,dc=org> with scope subtree
+# filter: (objectClass=*)
+# requesting: * + 
+#
+
+# 2. Branche pour organiser les utilisateurs (OU)
+dn: ou=users,dc=example,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+# 3. Branche pour organiser les groupes (OU)
+dn: ou=groups,dc=example,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+# 4. Premier utilisateur (Exemple : Jean Dupont)
+dn: uid=jdupont,ou=users,dc=example,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Jean Dupont
+sn: Dupont
+givenName: Jean
+uid: jdupont
+mail: jdupont@example.org
+userPassword: monMotDePasseSecurise
+
+# 5. Deuxième utilisateur (Exemple : Marie Martin)
+dn: uid=mmartin,ou=users,dc=example,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Marie Martin
+sn: Martin
+givenName: Marie
+uid: mmartin
+mail: mmartin@example.org
+userPassword: unAutreMotDePasse
+
+# 6. Un groupe contenant les deux utilisateurs (Classe standard posixGroup)
+dn: cn=developpeurs,ou=groups,dc=example,dc=org
+objectClass: top
+objectClass: posixGroup
+cn: developpeurs
+gidNumber: 5001
+memberUid: jdupont
+memberUid: mmartin
+
+# 7. Un groupe alternatif (Classe standard groupOfNames)
+dn: cn=utilisateurs_web,ou=groups,dc=example,dc=org
+objectClass: top
+objectClass: groupOfNames
+cn: utilisateurs_web
+member: uid=jdupont,ou=users,dc=example,dc=org
+member: uid=mmartin,ou=users,dc=example,dc=org
