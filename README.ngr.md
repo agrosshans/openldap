@@ -153,18 +153,7 @@ $ podman unshare chown -R 911:911 ./phpldapadmin/certs/
 
 
 
-**run phpldapadmin container with the following command**
 
-``` bash
-sudo podman run --name phpldapadmin --hostname phpldapadmin.lanathome.org \
-  --network phpldapadmin-bridge \
-  --ip 10.89.12.20 \
-  --publish 9080:80/tcp \
-  --publish 9443:443/tcp \
-  --volume phpldapadmin/certs:/container/service/phpldapadmin/assets/apache2/certs:Z \
-  --env-file phpldapadmin/.env \
-docker.io/phpldapadmin/phpldapadmin:latest
-```
 
 **check the network interface and ip address of the rootfull network created for openldap and phpldapadmin containers**
 
@@ -260,6 +249,79 @@ sudo podman cp openldap/lanathome_org.ldif openldap:/lanathome_org.ldif
 ldap:/$ ldapmodify -x -D "cn=admin,cn=config" -w xxxxxxxxxx -H ldapi:/// -f /admin-rights.ldif
 ```
 
+**another example of ldapmodify to change the admin password**
+
+``` bash
+ldapmodify -x -D "cn=admin,cn=config" -w xxxxxxxxxx -H ldapi:///  <<EOF
+dn: cn=admin,ou=services,dc=lanathome,dc=org
+changetype: modify
+replace: userPassword
+userPassword: {SSHA}jgKjEdBG/E2E22Q6/PDUKdqT/L/Kr546
+EOF
+```
+
+``` bash
+ldap:/$ ldapmodify -x -D "cn=admin,cn=config" -W -H ldapi:/// <<EOF
+dn: olcDatabase={1}mdb,cn=config
+changetype: modify
+replace: olcAccess
+olcAccess: {1}to dn.base="cn=admin,ou=services,dc=lanathome,dc=org" 
+  by dn.exact="cn=admin,ou=services,dc=lanathome,dc=org" read 
+  by * break
+EOF
+Enter LDAP Password: 
+modifying entry "olcDatabase={1}mdb,cn=config"
+```
+
+``` bash
+ldap:/$ ldapmodify -x -D "cn=admin,cn=config" -w xxxxxxxxxx -H ldapi:/// <<EOF
+dn: uid=jdupont,ou=users,dc=lanathome,dc=org
+changetype: modify
+replace: mail
+mail: jean.dupont@lanathome.org
+EOF
+modifying entry "uid=jdupont,ou=users,dc=lanathome,dc=org"
+ldap_modify: Insufficient access (50)
+```
+
+**Donner les droits d'administration complets à admin**
+
+``` bash
+ldap:/$ ldapmodify -x -D "cn=admin,cn=config" -W -H ldapi:/// <<EOF
+dn: olcDatabase={1}mdb,cn=config
+changetype: modify
+replace: olcAccess
+olcAccess: {1}to dn.base="cn=admin,ou=services,dc=lanathome,dc=org" 
+  by dn.exact="cn=admin,ou=services,dc=lanathome,dc=org" read 
+  by * break
+EOF
+Enter LDAP Password: 
+modifying entry "olcDatabase={1}mdb,cn=config"
+```
+
+
+
+# Entry 6: uid=jdupont,ou=users,dc=lanathome,dc=org
+dn: uid=jdupont,ou=users,dc=lanathome,dc=org
+cn: Jean Dupont
+givenName: Jean
+mail: jdupont@lanathome.org
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+sn: Dupont
+uid: jdupont
+
+
+
+ldapmodify -Q -Y EXTERNAL -H ldapi:/// <<EOF
+dn: uid=jdupont,ou=users,dc=lanathome,dc=org
+changetype: modify
+replace: mail
+mail: jean.dupont@lanathome.org
+EOF
+
 **check the certificate is valid and trusted by the system**
 
 ``` bash
@@ -279,7 +341,18 @@ ldapsearch -x -H ldaps://ldap.lanathome.org:6360 \
 sAMAccountName=admin
 ```
 
+**run phpldapadmin container with the following command**
 
+``` bash
+sudo podman run --name phpldapadmin --hostname phpldapadmin.lanathome.org \
+  --network phpldapadmin-bridge \
+  --ip 10.89.12.20 \
+  --publish 9080:80/tcp \
+  --publish 9443:443/tcp \
+  --volume phpldapadmin/certs:/container/service/phpldapadmin/assets/apache2/certs:Z \
+  --env-file phpldapadmin/.env \
+  --detach docker.io/phpldapadmin/phpldapadmin:latest
+```
 
 **troubleshoot the openldap and phpldapadmin containers**
 
@@ -287,6 +360,11 @@ sAMAccountName=admin
 sudo podman logs --tail 50 phpldapadmin
 sudo podman logs --tail 50 openldap
 ```
+
+
+[phpldapadmin web interface](http://phpldapadmin.lanathome.org:8080/)
+
+
 
 **stop openldap container**
 
@@ -390,3 +468,5 @@ git config --add --local branch.openldap/dev-4.vscode-merge-base openldap/main
 ``` bash
 git push -u openldap openldap/dev-4
 ```
+
+
