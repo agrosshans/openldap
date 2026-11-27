@@ -317,6 +317,63 @@ git add config.json
 ``` bash
 git commit -m "xxx" ./xxxxxx
 ```
+
 ``` bash
 git push -u openldap openldap/dev-3
+```
+
+**Checks your local repository configuration (.git/config) to see what VS Code has recorded as the base branch for main.**
+
+• Breakdown:
+	• --get: Read a value.
+	• --local: Look only in the current repository's config (not your global user config).
+	• branch.main.vscode-merge-base: The custom setting name VS Code creates for the main branch.
+
+
+``` bash
+$ git config --get --local branch.main.vscode-merge-base
+```
+
+**Does the exact same thing as the first command, but checks the recorded base branch for your openldap/dev-4 branch instead.**
+
+``` bash
+$ git config --get --local branch.openldap/dev-4.vscode-merge-base
+```
+
+
+**Searches the local history (reflog) of the openldap/dev-4 branch specifically for the log entry created when the branch was first branched off.**
+
+• Why VS Code runs this: If the previous git config check returned nothing, VS Code runs this command to figure out where openldap/dev-4 originally came from (e.g., "branch: Created from openldap/main").
+
+``` bash
+$ git reflog openldap/dev-4 --grep-reflog=branch
+```
+
+
+**Does the exact same thing as the first command, but checks the recorded base branch for your openldap/dev-4 branch instead.**
+
+``` bash
+$ git config --get --local branch.openldap/dev-4.vscode-merge-base
+```
+
+**Searches the local history (reflog) of the openldap/dev-4 branch specifically for the log entry created when the branch was first branched off.**
+
+• Why VS Code runs this: If the previous git config check returned nothing, VS Code runs this command to figure out where openldap/dev-4 originally came from (e.g., "branch: Created from openldap/main").
+
+``` bash
+$ git reflog openldap/dev-4 --grep-reflog=branch
+```
+
+
+**Saves openldap/main as the official base branch for openldap/dev-4 in your local .git/config file.**
+
+• Why VS Code runs this: Now that it figured out from step 3 that openldap/dev-4 was created from openldap/main, it saves that information so it doesn't have to search the reflog again next time.
+
+``` bash
+git config --add --local branch.openldap/dev-4.vscode-merge-base openldap/main
+```
+
+
+``` bash
+git push -u openldap openldap/dev-4
 ```
