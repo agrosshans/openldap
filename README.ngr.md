@@ -248,7 +248,7 @@ sudo podman cp openldap/lanathome_org.ldif openldap:/lanathome_org.ldif
 **apply with ldapmodify**
 
 ``` bash
-ldap:/$ ldapmodify -x -D "cn=admin,cn=config" -w xxxxxxxxxx -H ldapi:/// -f /admin-rights.ldif
+ldapmodify -x -D "cn=admin,cn=config" -W -H ldapi:/// -f /admin-rights.ldif
 ```
 
 **another example of ldapmodify to change the admin password**
