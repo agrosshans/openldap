@@ -303,6 +303,9 @@ modifying entry "olcDatabase={1}mdb,cn=config"
 
 
 
+**other usage of ldapmodify**
+
+``` bash
 # Entry 6: uid=jdupont,ou=users,dc=lanathome,dc=org
 dn: uid=jdupont,ou=users,dc=lanathome,dc=org
 cn: Jean Dupont
@@ -314,15 +317,16 @@ objectClass: person
 objectClass: top
 sn: Dupont
 uid: jdupont
+```
 
-
-
+``` bash
 ldapmodify -Q -Y EXTERNAL -H ldapi:/// <<EOF
 dn: uid=jdupont,ou=users,dc=lanathome,dc=org
 changetype: modify
 replace: mail
 mail: jean.dupont@lanathome.org
 EOF
+```
 
 **check the certificate is valid and trusted by the system**
 
