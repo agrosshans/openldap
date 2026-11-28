@@ -95,10 +95,12 @@ sudo podman run --name openldap --hostname ldap.lanathome.org \
   --publish 3890:3890 \
   --publish 6360:6360 \
   --network phpldapadmin-bridge \
-  --volume openldap/certs:/container/services/openldap/assets/certs:Z \
+  --volume ./openldap/certs:/container/services/openldap/assets/certs:Z \
   --env-file openldap/.env \
   quay.io/agrosshans/ngr-container-openldap
 ```
+
+
 
 **change ownership of the certs directory to the user and group id used by the openldap container**
 
